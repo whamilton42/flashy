@@ -1,0 +1,42 @@
+/* App Controllers */
+
+function FlashyCtrl($route, $xhr) 
+{
+  $xhr.defaults.headers.post['Content-Type'] = 'application/json'
+  $xhr.defaults.headers.put['Content-Type'] = 'application/json'
+
+  // assumes the presence of jQuery
+  var token = $("meta[name='csrf-token']").attr("content");
+  $xhr.defaults.headers.post['X-CSRF-Token'] = token;
+  $xhr.defaults.headers.put['X-CSRF-Token'] = token;
+  $xhr.defaults.headers['delete']['X-CSRF-Token'] = token;
+
+  $route.when('/flashcards',
+      {template: '<%= asset_path("flashcards.html") %>', controller: FlashcardsCtrl});
+
+  $route.when('/flashcards/:flashcard_id',
+      {template: '<%= asset_path("flashcard.html") %>', controller: FlashcardCtrl});
+
+  console.log($route);
+  $route.otherwise({redirectTo: '/flashcards'});
+}
+
+FlashyCtrl.$inject = ['$route', '$xhr'];
+
+
+function FlashcardsCtrl(Flashcards) 
+{
+  this.flashcards = Flashcards.index();
+}
+
+FlashcardsCtrl.$inject = ['Flashcards'];
+
+
+function FlashcardCtrl(Flashcards, $routeParams) 
+{
+  var self = this;
+
+  self.flashcard = Flashcards.get({ flashcard_id: $routeParams.flashcard_id });
+}
+
+FlashcardsCtrl.$inject = ['Flashcards'];
